@@ -1,0 +1,30 @@
+﻿@page "/new"
+@inject HttpClient client
+
+<h1>New</h1>
+
+<InputFile OnChange="HandleFileSelected" />
+
+<p>@status</p>
+
+@code {
+    string status;
+
+    async Task HandleFileSelected(IFileListEntry[] files)
+    {
+        var file = files.FirstOrDefault();
+
+        if (file != null)
+        {
+            var ms = new MemoryStream();
+            await file.Data.CopyToAsync(ms);
+
+            status = $"Finished loading {file.Size} bytes from {file.Name}";
+
+            var content = new MultipartFormDataContent {
+                { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
+            };
+            await client.PostAsync("https://localhost:44319/processes", content);
+        }
+    }
+}

@@ -1,0 +1,61 @@
+@page "/list"
+@inject HttpClient Http
+
+<h1>List</h1>
+
+@if (processes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Identifier</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var process in processes)
+            {
+                <tr>
+                    <td>@process.Id</td>
+
+                    @{
+                        if (process.Status == 0)
+                        {
+                            <td>Created</td>
+                        }
+                        else if (process.Status == 1)
+                        {
+                            <td>Started</td>
+                        }
+                        else if (process.Status == 2)
+                        {
+                            <td>Succeded</td>
+                        }
+                        else if (process.Status == 4)
+                        {
+                            <td>Failed</td>
+                        }
+                        else
+                        {
+                            <td>Not Available</td>
+                        }
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private ProcessList[] processes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        processes = await Http.GetFromJsonAsync<ProcessList[]>("https://localhost:44319/processes");
+    }
+}
